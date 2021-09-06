@@ -1,5 +1,5 @@
 import picar_4wd as fc
-import time
+import time as t
 from random import random 
 
 # Helper function which returns true if obstacle is within x cm
@@ -27,6 +27,6 @@ def turnRandomAndStop():
     time = 2.5 
 
     fc.turn_left(power)
-    time.sleep(random()*time)
+    t.sleep(random()*time)
     fc.stop()
     
