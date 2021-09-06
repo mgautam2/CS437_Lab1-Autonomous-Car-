@@ -22,7 +22,7 @@ def isAnythingInFront():
         return True
 
 # Helper function which turns to a random angle
-def turnRandom():
+def turnRandomAndStop():
     power = 50
     time = 2.5 
 
