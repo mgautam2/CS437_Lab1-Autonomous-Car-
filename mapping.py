@@ -1,4 +1,6 @@
 import picar_4wd as fc
+import time
+from random import random 
 
 # Helper function which returns true if obstacle is within x cm
 def isAnythingInFront():
@@ -20,5 +22,11 @@ def isAnythingInFront():
         return True
 
 # Helper function which turns to a random angle
-def stopAndTurnRandom():
-    pass
+def turnRandom():
+    power = 50
+    time = 2.5 
+
+    fc.turn_left(power)
+    time.sleep(random()*time)
+    fc.stop()
+    
