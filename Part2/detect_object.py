@@ -1,0 +1,1 @@
+# Create a grid that has a granularity of 25cm x 25cm
