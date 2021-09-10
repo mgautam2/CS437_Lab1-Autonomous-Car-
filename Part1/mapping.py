@@ -14,7 +14,7 @@ def isAnythingInFront():
     # return tmp != [2,2,2,2]
 
     # Don't turn servo, just return True when distance is 50 cm
-    threshhold = 50
+    threshhold = 25
     distance = fc.get_distance_at(0)
     if distance > threshhold or distance == -2:
         return False
