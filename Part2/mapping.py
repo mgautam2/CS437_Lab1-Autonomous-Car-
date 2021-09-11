@@ -24,17 +24,17 @@ def scan_step_return_distances():
         us_step = STEP
     
     # find the distance to the object and the x/y components
-    status = fc.get_distance_at(current_angle)
-    y_dist = round(math.cos(math.radians(abs(current_angle)))*status)
-    x_dist = round(math.sin(math.radians(abs(current_angle)))*status)
-    if (current_angle < 0):
-        x_dist = x_dist * -1
-    x_dist = x_dist + 100 # shift horizontal distances by 1/2 the size of the grid for indexing
+    distance = fc.get_distance_at(current_angle)
+    y_idx = round(math.cos(math.radians((current_angle)))*distance)
+    x_idx = round(math.sin(math.radians((current_angle)))*distance)
+    # if (current_angle < 0):
+    #     x_idx = x_idx * -1
+    x_idx = x_idx + 100 # shift horizontal distances by 1/2 the size of the grid for indexing
 
     # save the objects coordinates and their distances/angles (reject ones that are far away or not detected)
-    if status != -2 and status < 100:
-        print("adding (", x_dist-100, ",", y_dist, ") from angle", current_angle , " and distance ", status)
-        map[y_dist][x_dist] = 1
+    if distance != -2 and distance < 99:
+        print("adding (", x_idx-100, ",", y_idx, ") from angle", current_angle , " and distance ", distance)
+        map[99-y_idx][x_idx] = 1
 
 
 def main():
