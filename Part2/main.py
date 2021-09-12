@@ -2,6 +2,7 @@ import time
 import sys
 import signal
 import argparse
+import _thread
 
 import picar_4wd as fc
 import mapping as mp
@@ -29,8 +30,16 @@ if __name__ == "__main__":
 
     # Initialise oject detection object
 
-    # Create thread for routing algorithm and ultrasonic sensor
+    # Create thread for mapping and ultrasonic sensor
+
+    # Create thread for routing algorithm and driving
 
     # Create thread for camera
+    eye = do.Eye(map)
+    try:
+        _thread.start_new_thread( eye.main(), ("Camera thread") )
+    except:
+        print ("Error: unable to start thread")
 
-    pass
+    while True:
+        pass
