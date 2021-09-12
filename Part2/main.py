@@ -1,11 +1,13 @@
 import time
 import sys
 import signal
+import argparse
 
 import picar_4wd as fc
 import mapping as mp
 import detect_object as do
 import routing as rt
+import map as ma
 
 def signal_handler(sig, frame):
     fc.stop()
@@ -13,7 +15,17 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(description="Create map and routing input")
+    parser.add_argument('--x', help='Total cells in the x direction', required=True, type=int, default=100)
+    parser.add_argument('--y', help='Total cells in the y direction', required=True, type=int, default=100)
+    parser.add_argument('--startx', help='Start x coord', required=True, type=int, default=0)
+    parser.add_argument('--starty', help='Start y coord', required=True, type=int, default=0)
+    parser.add_argument('--endx', help='End x coord', required=True, type=int, default=100)
+    parser.add_argument('--endy', help='End y coord', required=True, type=int, default=100)
+    args = parser.parse_args()
+
     # Initialise routing parameters and Map
+    map = ma.Map(args.x, args.y, (args.startx, args.starty))
 
     # Initialise oject detection object
 
