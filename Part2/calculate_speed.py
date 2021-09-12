@@ -1,17 +1,22 @@
+from os import name
 import picar_4wd as fc
 import time
 
-distance_start = fc.get_distance_at(0)
-time.sleep(1)
-fc.forward(90)
-time.sleep(1)
-fc.stop()
-time.sleep(1)
-distance_end = fc.get_distance_at(0)
+def printMoveSpeed(power):
+    distance_start = fc.get_distance_at(0)
+    time.sleep(1)
+    fc.forward(power)
+    time.sleep(1)
+    fc.stop()
+    time.sleep(1)
+    distance_end = fc.get_distance_at(0)
 
-print("Start:    " + str(distance_start))
-print("End:      " + str(distance_end))
-print("Speed:    " + str(distance_start - distance_end))
+    print("Start:    " + str(distance_start))
+    print("End:      " + str(distance_end))
+    print("Speed:    " + str(distance_start - distance_end))
+    
+def printRotateTime(power):
+    fc.turn_left(power)
 
 # power_to_speed = {
 #     20: 35.5,
@@ -25,7 +30,7 @@ print("Speed:    " + str(distance_start - distance_end))
 # }
 
 # power_to_turn_time = {
-#     20: ,
+#     20: 3.25,
 #     30: ,
 #     40: ,
 #     50: ,
@@ -34,3 +39,9 @@ print("Speed:    " + str(distance_start - distance_end))
 #     80: ,
 #     90: 
 # }
+
+if __name__ == "__main__":
+    printRotateTime(20)
+    time.sleep(0.8125)
+    fc.stop()
+    
