@@ -13,20 +13,12 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
 
-    # Initialise routing parameters
+    # Initialise routing parameters and Map
 
-    # Run while loop
-    while True:
+    # Initialise oject detection object
 
-        # Stop and build relative map
+    # Create thread for routing algorithm and ultrasonic sensor
 
-        # Use A star to get to best possible location on current map
+    # Create thread for camera
 
-        while True:
-
-            # Move to that location
-
-            # While driving, keep getting ultrasonic sensor data and 
-            # if an object exists in front, use openCV to detect object
-            pass
-
+    pass
