@@ -15,6 +15,10 @@ if __name__ == "__main__":
 
     # Initialise routing parameters
 
+    eye = do.Eye()
+
+    eye.classifyImage()
+
     # Run while loop
     while True:
 
