@@ -3,12 +3,37 @@ import sys
 import signal
 import argparse
 import _thread
+import threading
 
 import picar_4wd as fc
 import mapping as mp
 import detect_object as do
 import routing as rt
 import map as ma
+
+class myThread(threading.Thread):
+    def __init__(self, threadID, name, map, map_lock):    
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.map = map
+        self.map_lock = map_lock
+
+    def run(self):
+
+        # Routing and drive instance thread
+        if self.threadID == 1:
+            pass
+
+        # Mapping instance thread
+        if self.threadID == 2:
+            pass
+
+        # Camera instance thread
+        if self.threadID == 3:
+            eye = do.Eye(self.map, self.map_lock)
+            eye.main()
+
 
 def signal_handler(sig, frame):
     fc.stop()
@@ -27,6 +52,8 @@ if __name__ == "__main__":
 
     # Initialise routing parameters and Map
     map = ma.Map(args.x, args.y, (args.startx, args.starty))
+    map_lock = threading.Lock()
+    threads = []
 
     # Initialise oject detection object
 
@@ -35,11 +62,13 @@ if __name__ == "__main__":
     # Create thread for routing algorithm and driving
 
     # Create thread for camera
-    eye = do.Eye(map)
-    try:
-        _thread.start_new_thread( eye.main(), ("Camera thread") )
-    except:
-        print ("Error: unable to start thread")
+    eye_thread = myThread(3, "Eye", map, map_lock)
+    threads.append(eye_thread)
 
-    while True:
-        pass
+    # Run threads
+    for t in threads:
+        t.start()
+
+    # Wait for threads to complete and join threads
+    for t in threads:
+        t.join()

@@ -22,8 +22,9 @@ CAMERA_HEIGHT = 480
 
 class Eye:
 
-    def __init__(self, m):
+    def __init__(self, m, map_lock):
         self.map = m
+        self.map_lock = map_lock
 
     def load_labels(self, path):
         """Loads the labels file. Supports files with or without index numbers."""
@@ -72,7 +73,7 @@ class Eye:
                     'class_id': classes[i],
                     'score': scores[i]
                 }
-            results.append(result)
+                results.append(result)
         return results
 
 
@@ -118,7 +119,8 @@ class Eye:
                     annotator.text([5, 0], '%.1fms' % (elapsed_ms))
                     annotator.update()
 
-                    print(labels[int(results[0]['class_id'])])
+                    if len(results) > 0:
+                        print(labels[int(results[0]['class_id'])])
 
                     stream.seek(0)
                     stream.truncate()
