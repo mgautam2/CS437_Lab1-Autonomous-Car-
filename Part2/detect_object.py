@@ -15,7 +15,8 @@ import picamera
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
-import map
+import map as mp
+import constants as co
 
 CAMERA_WIDTH = 640
 CAMERA_HEIGHT = 480
@@ -92,9 +93,12 @@ class Eye:
             annotator.bounding_box([xmin, ymin, xmax, ymax])
             annotator.text([xmin, ymin], '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
 
+    def classify_on_map(self, label, start_index):
+        current_position = self.map.current_position
+        current_orientation = self.map.orientation
 
     def main(self):
-        threshhold = 0.4
+        threshhold = 0.6
         labels = self.load_labels("tmp/coco_labels.txt")
         interpreter = Interpreter("tmp/detect.tflite")
         interpreter.allocate_tensors()
@@ -119,8 +123,10 @@ class Eye:
                     annotator.text([5, 0], '%.1fms' % (elapsed_ms))
                     annotator.update()
 
-                    if len(results) > 0:
-                        print(labels[int(results[0]['class_id'])])
+                    start_index = 0
+                    for result in results:
+                        map_number = co.LABEL_TO_MAP[int(result['class_id'])]
+                        self.classify_on_map(map_number, start)
 
                     stream.seek(0)
                     stream.truncate()
