@@ -17,13 +17,19 @@ class UltrasonicMap:
     main_map = np.full([map_height,map_width], UNKNOWN_SPACE, dtype=int)
 
     def plotLine(self, x0, y0, x1, y1, type=UNCLASSIFIED_OBJECT):
+        hit_object = False
         dx =  abs(x1-x0)
         sx = 1 if x0<x1 else -1
         dy = -abs(y1-y0)
         sy = 1 if y0<y1 else -1
         err = dx+dy
         while (True):
-            if (self.main_map[x0][y0] != UNCLASSIFIED_OBJECT):
+            if (self.main_map[x0][y0] == UNCLASSIFIED_OBJECT):
+                hit_object = True
+            if ((x0-1) >= 0 and self.main_map[x0-1][y0] == UNCLASSIFIED_OBJECT) or ((y0-1) >= 0 and self.main_map[x0][y0-1] == UNCLASSIFIED_OBJECT or ((x0+1) < self.map_height and self.main_map[x0+1][y0] == UNCLASSIFIED_OBJECT) or ((y0+1) < self.map_width and self.main_map[x0][y0+1] == UNCLASSIFIED_OBJECT)):
+                hit_object = True
+
+            elif (type == UNCLASSIFIED_OBJECT or not hit_object):
                 self.main_map[x0][y0] = type
             if (x0 == x1 and y0 == y1):
                 break
@@ -67,18 +73,18 @@ class UltrasonicMap:
         else:
             self.prev_point = (0,0)
 
-    # def mark_free_space():
-    #     for i in range(100):
-    #         for j in range(200):
-    #             if (map[i][j] == UNCLASSIFIED_OBJECT):
-    #                 print("drawing line from (0,19) to ", (i, j))
-    #                 plotLine(i, j, 0, 19, type=FREE_SPACE)
+    def mark_free_space(self):
+        for i in range(self.map_height):
+            self.plotLine(0, int(self.map_width/2), i, 0, type=FREE_SPACE)
+            self.plotLine(0, int(self.map_width/2), i, self.map_width-1, type=FREE_SPACE)
+        for i in range(self.map_width):
+            self.plotLine(0, int(self.map_width/2), self.map_height-1, i, type=FREE_SPACE)
 
     '''
     The condensed map stores one element for every 5x5 square in the main map.
     - If the corresponding 5x5 grid contains any objects, the element is marked as an 
         object, regardless of the other values in the 5x5 square.
-    - If a cell's corresponding 5x5 grid contains free space and no objects, the cell is marked as free
+    - If the corresponding 5x5 grid contains free space and no objects, the element is marked as free
     - If all 25 elements in the 5x5 grid are unknown space, the element is marked as unknown space
     '''
     @staticmethod
@@ -114,6 +120,9 @@ class UltrasonicMap:
         # scan a few times and fill the main map with objects
         for i in range(64):
             self.scan_step_return_distances()
+
+        # mark free spaces
+        self.mark_free_space()
         
         # fill the condensed version of the map using the main map
         condensed_map = self.condense_map(self.main_map)
