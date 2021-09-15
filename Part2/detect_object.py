@@ -11,6 +11,7 @@ from annotation import Annotator
 
 import numpy as np
 import picamera
+from collections import deque
 
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
@@ -93,9 +94,62 @@ class Eye:
             annotator.bounding_box([xmin, ymin, xmax, ymax])
             annotator.text([xmin, ymin], '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
 
-    def classify_on_map(self, label, start_index):
-        current_position = self.map.current_position
-        current_orientation = self.map.orientation
+    def classify_object_on_map(self, label, x, y):
+        if self.map.getLabelAtPoint(x, y) != co.UNCLASSIFIED_OBJECT:
+            return False
+        
+        queue = deque()
+        queue.append((x,y))
+        
+        while len(queue) > 0:
+            a, b = queue.popleft()
+            if not self.map.isPointInBounds((a, b)):
+                continue
+            if self.map.getLabelAtPoint((a, b)) == co.UNCLASSIFIED_OBJECT:
+                self.map.setLableAtPoint((a, b), label)
+
+                # Push all adjacent points in queue
+                queue.append(a + 1, b)
+                queue.append(a + 1, b + 1)
+                queue.append(a, b + 1)
+                queue.append(a - 1, b + 1)
+                queue.append(a - 1, b)
+                queue.append(a - 1, b - 1)
+                queue.append(a, b - 1)
+                queue.append(a + 1, b - 1)
+        return True
+        
+                
+
+    def classify_on_map(self, label):
+        x, y = self.map.current_position
+
+        if self.map.current_orientation == 0:
+            for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
+                for i in range(x, max(x - 20, 0), -1):
+                    if self.classify_object_on_map(label, i, j):
+                        break
+        
+        if self.map.current_orientation == 1:
+            for i in range(max(x - 20, 0), min(x + 20, self.map.height), 1):
+                for j in range(y, min(y + 20, self.map.width), 1):
+                    self.classify_object_on_map(label, i, j)
+                    break
+
+        if self.map.current_orientation == 2:
+            for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
+                for i in range(x, min(x + 20, self.map.height), 1):
+                    self.classify_object_on_map(label, i, j)
+                    break
+        
+        if self.map.current_orientation == 3:
+            for i in range(max(x- 20, 0), min(x + 20, self.map.height)):
+                for j in range(y, max(y - 20, 0), -1):
+                    self.classify_object_on_map(label, i, j)
+                    break
+
+                
+
 
     def main(self):
         threshhold = 0.6
@@ -123,13 +177,13 @@ class Eye:
                     annotator.text([5, 0], '%.1fms' % (elapsed_ms))
                     annotator.update()
 
-                    start_index = 0
                     for result in results:
-                        map_number = co.LABEL_TO_MAP[int(result['class_id'])]
-                        self.classify_on_map(map_number, start)
+                        label = co.LABEL_TO_MAP[int(result['class_id'])]
+                        self.classify_on_map(label)
 
                     stream.seek(0)
                     stream.truncate()
 
             finally:
                 camera.stop_preview()
+
