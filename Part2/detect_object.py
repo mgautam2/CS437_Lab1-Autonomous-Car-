@@ -95,7 +95,7 @@ class Eye:
             annotator.text([xmin, ymin], '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
 
     def classify_object_on_map(self, label, x, y):
-        if self.map.getLabelAtPoint(x, y) != co.UNCLASSIFIED_OBJECT:
+        if self.map.getLabelAtPoint((x, y)) != co.UNCLASSIFIED_OBJECT:
             return False
         
         queue = deque()
@@ -124,25 +124,25 @@ class Eye:
     def classify_on_map(self, label):
         x, y = self.map.current_position
 
-        if self.map.current_orientation == 0:
+        if self.map.orientation == 0:
             for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
                 for i in range(x, max(x - 20, 0), -1):
                     if self.classify_object_on_map(label, i, j):
                         break
         
-        if self.map.current_orientation == 1:
+        if self.map.orientation == 1:
             for i in range(max(x - 20, 0), min(x + 20, self.map.height), 1):
                 for j in range(y, min(y + 20, self.map.width), 1):
                     self.classify_object_on_map(label, i, j)
                     break
 
-        if self.map.current_orientation == 2:
+        if self.map.orientation == 2:
             for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
                 for i in range(x, min(x + 20, self.map.height), 1):
                     self.classify_object_on_map(label, i, j)
                     break
         
-        if self.map.current_orientation == 3:
+        if self.map.orientation == 3:
             for i in range(max(x- 20, 0), min(x + 20, self.map.height)):
                 for j in range(y, max(y - 20, 0), -1):
                     self.classify_object_on_map(label, i, j)
@@ -180,6 +180,9 @@ class Eye:
                     for result in results:
                         label = co.LABEL_TO_MAP[int(result['class_id'])]
                         self.classify_on_map(label)
+                        print(label)
+                    print()
+                    print()
 
                     stream.seek(0)
                     stream.truncate()
