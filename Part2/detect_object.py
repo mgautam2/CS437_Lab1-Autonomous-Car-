@@ -7,8 +7,6 @@ import io
 import re
 import time
 
-from annotation import Annotator
-
 import numpy as np
 import picamera
 from collections import deque
@@ -16,7 +14,6 @@ from collections import deque
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
-import map as mp
 import constants as co
 
 CAMERA_WIDTH = 640
@@ -79,21 +76,6 @@ class Eye:
         return results
 
 
-    def annotate_objects(self, annotator, results, labels):
-        """Draws the bounding box and label for each object in the results."""
-        for obj in results:
-            # Convert the bounding box figures from relative coordinates
-            # to absolute coordinates based on the original resolution
-            ymin, xmin, ymax, xmax = obj['bounding_box']
-            xmin = int(xmin * CAMERA_WIDTH)
-            xmax = int(xmax * CAMERA_WIDTH)
-            ymin = int(ymin * CAMERA_HEIGHT)
-            ymax = int(ymax * CAMERA_HEIGHT)
-
-            # Overlay the box, label, and score on the camera preview
-            annotator.bounding_box([xmin, ymin, xmax, ymax])
-            annotator.text([xmin, ymin], '%s\n%.2f' % (labels[obj['class_id']], obj['score']))
-
     def classify_object_on_map(self, label, x, y):
         if self.map.getLabelAtPoint((x, y)) != co.UNCLASSIFIED_OBJECT:
             return False
@@ -118,37 +100,34 @@ class Eye:
                 queue.append(a, b - 1)
                 queue.append(a + 1, b - 1)
         return True
-        
-                
+                   
 
     def classify_on_map(self, label):
         x, y = self.map.current_position
 
-        if self.map.orientation == 0:
+        if self.map.orientation == co.UP:
             for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
                 for i in range(x, max(x - 20, 0), -1):
                     if self.classify_object_on_map(label, i, j):
                         break
         
-        if self.map.orientation == 1:
+        if self.map.orientation == co.RIGHT:
             for i in range(max(x - 20, 0), min(x + 20, self.map.height), 1):
                 for j in range(y, min(y + 20, self.map.width), 1):
                     self.classify_object_on_map(label, i, j)
                     break
 
-        if self.map.orientation == 2:
+        if self.map.orientation == co.DOWN:
             for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
                 for i in range(x, min(x + 20, self.map.height), 1):
                     self.classify_object_on_map(label, i, j)
                     break
         
-        if self.map.orientation == 3:
+        if self.map.orientation == co.LEFT:
             for i in range(max(x- 20, 0), min(x + 20, self.map.height)):
                 for j in range(y, max(y - 20, 0), -1):
                     self.classify_object_on_map(label, i, j)
                     break
-
-                
 
 
     def main(self):
@@ -158,31 +137,19 @@ class Eye:
         interpreter.allocate_tensors()
         _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
 
-        with picamera.PiCamera(
-            resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
+        with picamera.PiCamera(resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
             camera.start_preview()
             try:
                 stream = io.BytesIO()
-                annotator = Annotator(camera)
                 for _ in camera.capture_continuous(
                     stream, format='jpeg', use_video_port=True):
                     stream.seek(0)
                     image = Image.open(stream).convert('RGB').resize((input_width, input_height), Image.ANTIALIAS)
-                    start_time = time.monotonic()
                     results = self.detect_objects(interpreter, image, threshhold)
-                    elapsed_ms = (time.monotonic() - start_time) * 1000
-
-                    annotator.clear()
-                    self.annotate_objects(annotator, results, labels)
-                    annotator.text([5, 0], '%.1fms' % (elapsed_ms))
-                    annotator.update()
 
                     for result in results:
                         label = co.LABEL_TO_MAP[int(result['class_id'])]
                         self.classify_on_map(label)
-                        print(label)
-                    print()
-                    print()
 
                     stream.seek(0)
                     stream.truncate()
