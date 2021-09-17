@@ -41,17 +41,17 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Create map and routing input")
-    parser.add_argument('--x', help='Total cells in the x direction', required=True, type=int, default=100)
-    parser.add_argument('--y', help='Total cells in the y direction', required=True, type=int, default=100)
-    parser.add_argument('--startx', help='Start x coord', required=True, type=int, default=0)
-    parser.add_argument('--starty', help='Start y coord', required=True, type=int, default=0)
-    parser.add_argument('--endx', help='End x coord', required=True, type=int, default=100)
-    parser.add_argument('--endy', help='End y coord', required=True, type=int, default=100)
-    parser.add_argument('--orientation', help='0: -ve height direction, 1: +ve width direction, 2: +ve height direction, 3: -ve width direction', type=int, default=2)
+    parser.add_argument('--h', help='Total cells in the x direction', required=True, type=int, default=100)
+    parser.add_argument('--w', help='Total cells in the y direction', required=True, type=int, default=100)
+    parser.add_argument('--starth', help='Start x coord', required=True, type=int, default=0)
+    parser.add_argument('--startw', help='Start y coord', required=True, type=int, default=0)
+    parser.add_argument('--endh', help='End x coord', required=True, type=int, default=100)
+    parser.add_argument('--endw', help='End y coord', required=True, type=int, default=100)
+    parser.add_argument('--orientation', help='0: -ve height direction, 1: +ve width direction, 2: +ve height direction, 3: -ve width direction', required=True, type=int, default=2)
     args = parser.parse_args()
 
     # Initialise routing parameters and Map
-    map = ma.Map(args.x, args.y, (args.startx, args.starty), args.orientation)
+    map = ma.Map(args.h, args.w, (args.starth, args.startw), args.orientation)
     map_lock = threading.Lock()
     threads = []
 
