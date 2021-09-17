@@ -110,7 +110,7 @@ class UltrasonicMap:
         map_width = map.shape[1]
         for row in range(map_height):
             for col in range(map_width):
-                print(map[(map_height-1)-row][(map_width-1)-col], end=', ')
+                print(map[row][col], end=', ')
             print('\n', end='')
 
     def GetUltrasonicMapping(self):
@@ -131,6 +131,8 @@ class UltrasonicMap:
 
         # face forward again and print the condensed map
         fc.get_distance_at(0) #hack to set the servo position back to center
+
+        return condensed_map
             
 if __name__ == "__main__":
     scanner = UltrasonicMap()

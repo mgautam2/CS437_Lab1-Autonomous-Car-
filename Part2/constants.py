@@ -10,6 +10,11 @@ CURRENT_CAR_POSITION = 9
 RELATIVE_MAP_WIDTH = 40
 RELTAIVE_MAP_HEIGHT = 20
 
+UP = 0
+RIGHT = 1
+DOWN = 2
+LEFT = 3
+
 MAP_TO_LABEL = {
     0: [],
     1: [],
@@ -104,4 +109,19 @@ LABEL_TO_MAP = {
     87: 2,
     88: 2,
     89: 2
+}
+
+POWER_TO_SPEED = {
+    20: 35.5,
+    30: 39.5,
+    40: 44.1,
+    50: 47.7,
+    60: 52.5,
+    70: 55.4,
+    80: 59.5,
+    90: 62.9 
+}
+
+POWER_TO_TURN_TIME = {
+    20: 3.25
 }

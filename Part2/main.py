@@ -48,10 +48,11 @@ if __name__ == "__main__":
     parser.add_argument('--starty', help='Start y coord', required=True, type=int, default=0)
     parser.add_argument('--endx', help='End x coord', required=True, type=int, default=100)
     parser.add_argument('--endy', help='End y coord', required=True, type=int, default=100)
+    parser.add_argument('--orientation', help='0: -ve height direction, 1: +ve width direction, 2: +ve height direction, 3: -ve width direction', type=int, default=2)
     args = parser.parse_args()
 
     # Initialise routing parameters and Map
-    map = ma.Map(args.x, args.y, (args.startx, args.starty))
+    map = ma.Map(args.x, args.y, (args.startx, args.starty), args.orientation)
     map_lock = threading.Lock()
     threads = []
 
