@@ -15,18 +15,18 @@ power_to_speed = {
 }
 
 power_to_turn_time = {
-    20: 3.25
+10: 3.9
 }
 
-power_val = 40
-turn_power_val = 20
+power_val = 20
+turn_power_val = 10
 GRID_SIZE = 30
 
 class Dir(enum.Enum):
    Up = 0
    Right = 1
-   Left = 2
-   Down = 3
+   Down = 2
+   Left = 3
 
 class Drive:
 
@@ -54,48 +54,78 @@ class Drive:
         elif (val == 1):
             return Dir.Right
         elif (val == 2):
-            return Dir.Left
-        elif (val == 3):
             return Dir.Down
+        elif (val == 3):
+            return Dir.Left 
+
+    def update_pos(self):
+        if (self.direction == Dir.Up):
+            self.pos = (self.pos[0] - 1, self.pos[1])
+        elif (self.direction == Dir.Right):
+            self.pos = (self.pos[0], self.pos[1] + 1)
+        elif (self.direction == Dir.Down):
+            self.pos = (self.pos[0] + 1, self.pos[1])
+        elif (self.direction == Dir.Left):
+            self.pos = (self.pos[0], self.pos[1] - 1)
 
     """
     Rotate the car
     """
-    def turn(self, dir_num):
-        print("Turning")
+    def turn(self, new_dir):
+        dir_num = new_dir.value - self.direction.value
+        print("Turning ->  " + new_dir.name)
+        
         if (dir_num > 0):
-            fc.right(turn_power_val)
-            sleep_time = dir_num * GRID_SIZE / power_to_turn_time[turn_power_val]
+            fc.turn_right(turn_power_val)
+            sleep_time = ( dir_num * power_to_turn_time[turn_power_val] ) / 4
             time.sleep(sleep_time)
             fc.stop() 
             
         elif (dir_num < 0):
-            fc.left(turn_power_val)
-            sleep_time = abs(dir_num) * GRID_SIZE / power_to_turn_time[turn_power_val]
+            fc.turn_left(turn_power_val)
+            sleep_time = ( abs(dir_num) * power_to_turn_time[turn_power_val] ) / 4
             time.sleep(sleep_time)
-            fc.stop()    
-        pass
+            fc.stop() 
 
-    """
-    Translate the car
-    """
+        self.direction = new_dir   
+
     def translate(self): 
-        print("Move")
-        # move a car in a particular direction for one unit
+        print("Moveing  -> " + self.direction.name)
+        
         fc.forward(power_val)
         sleep_time = GRID_SIZE / power_to_speed[power_val]
         time.sleep(sleep_time)
         fc.stop() 
+        self.update_pos()
 
     """
     Main drive function 
     """
-    def drive(self, new_pos):
+    def drive_step(self, new_pos):
         
         new_dir = self.turning_dir(new_pos)
-        self.turn(self.direction.value - new_dir.value)
+        self.turn(new_dir)
         self.translate()
+        print("New pos is " + str(self.pos) + " And direction is " + self.direction.name +"\n-----------------")
         
+
+
+
+# TEST THE PATH
+
+
 d = Drive()
-d.drive((0,1))
+print("Starting pos is " + str(d.pos) + " And direction is " + d.direction.name +"\n-----------------")
+
+
+d.drive_step((1,0))
+# d.drive_step((1,1))
+# d.drive_step((1,2))
+# d.drive_step((1,3))
+# d.drive_step((2,3))
+# d.drive_step((3,3))
+# d.drive_step((3,4))
+# d.drive_step((4,4))
+
+
 
