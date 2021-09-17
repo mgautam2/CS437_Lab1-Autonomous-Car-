@@ -10,6 +10,7 @@ class Map:
         self.orientation = orientation
         self.height = x
         self.width = y
+        self.scanning_map = False
 
     def insertMapSection(self, ultrasonicMap):
         ultrasonic_map_width = ultrasonicMap.shape[1]

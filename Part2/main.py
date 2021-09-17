@@ -2,7 +2,6 @@ import time
 import sys
 import signal
 import argparse
-import _thread
 import threading
 
 import picar_4wd as fc

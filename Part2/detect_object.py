@@ -6,6 +6,7 @@ import argparse
 import io
 import re
 import time
+import math
 
 import numpy as np
 import picamera
@@ -14,6 +15,7 @@ from collections import deque
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 
+import picar_4wd as fc
 import constants as co
 
 CAMERA_WIDTH = 640
@@ -102,32 +104,21 @@ class Eye:
         return True
                    
 
-    def classify_on_map(self, label):
-        x, y = self.map.current_position
+    def classify_on_map(self, label, angle):
+        h, w = self.map.current_position
 
-        if self.map.orientation == co.UP:
-            for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
-                for i in range(x, max(x - 20, 0), -1):
-                    if self.classify_object_on_map(label, i, j):
-                        break
-        
-        if self.map.orientation == co.RIGHT:
-            for i in range(max(x - 20, 0), min(x + 20, self.map.height), 1):
-                for j in range(y, min(y + 20, self.map.width), 1):
-                    self.classify_object_on_map(label, i, j)
-                    break
+        for i in range(co.RELTAIVE_MAP_HEIGHT):
+            h_idx = round((math.cos(math.radians((angle)))*i))
+            w_idx = round((math.sin(math.radians((angle)))*i))
 
-        if self.map.orientation == co.DOWN:
-            for j in range(max(y - 20, 0), min(y + 20, self.map.width), 1):
-                for i in range(x, min(x + 20, self.map.height), 1):
-                    self.classify_object_on_map(label, i, j)
-                    break
-        
-        if self.map.orientation == co.LEFT:
-            for i in range(max(x- 20, 0), min(x + 20, self.map.height)):
-                for j in range(y, max(y - 20, 0), -1):
-                    self.classify_object_on_map(label, i, j)
-                    break
+            if self.map.orientation == co.UP:
+                self.classify_object_on_map(label, h - h_idx, w + w_idx)
+            if self.map.orientation == co.RIGHT:
+                self.classify_object_on_map(label, h + h_idx, w + w_idx)
+            if self.map.orientation == co.DOWN:
+                self.classify_object_on_map(label, h + h_idx, w - w_idx)
+            if self.map.orientation == co.LEFT:
+                self.classify_object_on_map(label, h - h_idx, w - w_idx)
 
 
     def main(self):
@@ -139,20 +130,41 @@ class Eye:
 
         with picamera.PiCamera(resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
             camera.start_preview()
+            ANGLE_RANGE = 160
+            STEP = 10
+            us_step = STEP
+            current_angle = -80
+            max_angle = ANGLE_RANGE/2
+            min_angle = -ANGLE_RANGE/2
+            fc.get_distance_at(current_angle)
+
             try:
                 stream = io.BytesIO()
-                for _ in camera.capture_continuous(
-                    stream, format='jpeg', use_video_port=True):
+                for _ in camera.capture_continuous(stream, format='jpeg', use_video_port=True):
                     stream.seek(0)
                     image = Image.open(stream).convert('RGB').resize((input_width, input_height), Image.ANTIALIAS)
                     results = self.detect_objects(interpreter, image, threshhold)
 
                     for result in results:
                         label = co.LABEL_TO_MAP[int(result['class_id'])]
-                        self.classify_on_map(label)
+                        self.classify_on_map(label, current_angle)
+                        print(label)
+
+                    # Set to new angle
+                    current_angle += us_step
+                    if current_angle >= max_angle:
+                        current_angle = max_angle
+                        us_step = -STEP
+                    elif current_angle <= min_angle:
+                        current_angle = min_angle
+                        us_step = STEP
+                    fc.get_distance_at(current_angle)
 
                     stream.seek(0)
                     stream.truncate()
+
+                    if self.map.scanning_map:
+                        time.sleep(10)
 
             finally:
                 camera.stop_preview()
