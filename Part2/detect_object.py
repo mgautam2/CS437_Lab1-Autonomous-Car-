@@ -164,8 +164,7 @@ class Eye:
                     stream.truncate()
 
                     if self.map.scanning_map:
-                        time.sleep(10)
+                        time.sleep(4)
 
             finally:
                 camera.stop_preview()
-

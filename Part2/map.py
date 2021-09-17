@@ -1,6 +1,9 @@
 import numpy as np
 import math
+
+from picar_4wd.ultrasonic import Ultrasonic
 from constants import *
+import mapping as mp
 
 class Map:
     
@@ -52,4 +55,13 @@ class Map:
         if x < self.width and x >= 0 and y < self.height and y >= 0:
             return True
         return False
+
+    def scanSurroundings(self):
+        self.scanning_map = True
+
+        map = mp.UltrasonicMap()
+        relative_map = map.GetUltrasonicMapping()
+        self.insertMapSection(relative_map)
+
+        self.scanning_map = False
         
