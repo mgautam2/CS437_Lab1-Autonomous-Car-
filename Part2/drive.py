@@ -2,6 +2,10 @@ import enum
 import time
 import picar_4wd as fc
 
+import map 
+import mapping 
+import constants
+import routing
 
 power_to_speed = {
     20: 35.5,
@@ -14,13 +18,17 @@ power_to_speed = {
     90: 62.9 
 }
 
-power_to_turn_time = {
-10: 3.9
+power_right_turn_time = {
+10: 3.95
+}
+
+power_left_turn_time = {
+10: 3.8
 }
 
 power_val = 20
 turn_power_val = 10
-GRID_SIZE = 30
+GRID_SIZE = 20
 
 class Dir(enum.Enum):
    Up = 0
@@ -77,13 +85,13 @@ class Drive:
         
         if (dir_num > 0):
             fc.turn_right(turn_power_val)
-            sleep_time = ( dir_num * power_to_turn_time[turn_power_val] ) / 4
+            sleep_time = ( dir_num * power_right_turn_time[turn_power_val] ) / 4
             time.sleep(sleep_time)
             fc.stop() 
             
         elif (dir_num < 0):
             fc.turn_left(turn_power_val)
-            sleep_time = ( abs(dir_num) * power_to_turn_time[turn_power_val] ) / 4
+            sleep_time = ( abs(dir_num) * power_left_turn_time[turn_power_val] ) / 4
             time.sleep(sleep_time)
             fc.stop() 
 
@@ -103,29 +111,27 @@ class Drive:
     """
     def drive_step(self, new_pos):
         
+        if (self.pos == new_pos):
+            return
+
         new_dir = self.turning_dir(new_pos)
         self.turn(new_dir)
         self.translate()
         print("New pos is " + str(self.pos) + " And direction is " + self.direction.name +"\n-----------------")
-        
-
 
 
 # TEST THE PATH
+maze = map.Map(30, 30, (0, 0), constants.RIGHT)
 
+faltu_mapping = mapping.UltrasonicMap()
+maze.scanSurroundings()
+faltu_mapping.print_map(maze.map)
+route = routing.astar(maze.map, (0, 0), (20, 20))
 
 d = Drive()
 print("Starting pos is " + str(d.pos) + " And direction is " + d.direction.name +"\n-----------------")
 
 
-d.drive_step((1,0))
-# d.drive_step((1,1))
-# d.drive_step((1,2))
-# d.drive_step((1,3))
-# d.drive_step((2,3))
-# d.drive_step((3,3))
-# d.drive_step((3,4))
-# d.drive_step((4,4))
-
-
-
+for step in route:
+    print(step)
+    # d.drive_step(step)
