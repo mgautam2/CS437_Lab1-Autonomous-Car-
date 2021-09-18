@@ -61,12 +61,7 @@ if __name__ == "__main__":
         t.start()
 
     # Create thread for routing algorithm and driving
-    map.scanSurroundings()
-
-    time.sleep(20)
-    test = mp.UltrasonicMap()
-    test.print_map(map.map)
-    test.print_map(map.map)
+    
 
     # Wait for threads to complete and join threads
     for t in threads:

@@ -38,7 +38,6 @@ class Map:
                 if (self.isPointInBounds((map_j_idx, map_i_idx))):
                     self.setLabelAtPoint((map_i_idx, map_j_idx), ultrasonicMap[i][j])
 
-
     def printSelf(self):
         print(self.map)
         print(self.current_position)

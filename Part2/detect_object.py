@@ -122,7 +122,7 @@ class Eye:
 
 
     def main(self):
-        threshhold = 0.6
+        threshhold = 0.4
         labels = self.load_labels("tmp/coco_labels.txt")
         interpreter = Interpreter("tmp/detect.tflite")
         interpreter.allocate_tensors()
@@ -151,9 +151,14 @@ class Eye:
                             max_label = co.LABEL_TO_MAP[int(result['class_id'])]
                         else:
                             max_label = max(max_label, co.LABEL_TO_MAP[int(result['class_id'])])
-                        print(max_label)
 
                     if max_label:
+                        print(results)
+                        print(max_label)
+                        print()
+                        print()
+                        print()
+                        print()
                         self.classify_on_map(max_label, current_angle)
 
                     # Set to new angle
