@@ -5,6 +5,7 @@ import argparse
 import threading
 
 import picar_4wd as fc
+from picar_4wd.ultrasonic import Ultrasonic
 import mapping as mp
 import detect_object as do
 import routing as rt
@@ -20,16 +21,12 @@ class myThread(threading.Thread):
 
     def run(self):
 
-        # Routing and drive instance thread
+        # Routing, drive and mapping instance thread
         if self.threadID == 1:
             pass
 
-        # Mapping instance thread
-        if self.threadID == 2:
-            pass
-
         # Camera instance thread
-        if self.threadID == 3:
+        if self.threadID == 2:
             eye = do.Eye(self.map, self.map_lock)
             eye.main()
 
@@ -55,19 +52,21 @@ if __name__ == "__main__":
     map_lock = threading.Lock()
     threads = []
 
-    # Initialise oject detection object
-
-    # Create thread for mapping and ultrasonic sensor
-
-    # Create thread for routing algorithm and driving
-
     # Create thread for camera
-    eye_thread = myThread(3, "Eye", map, map_lock)
+    eye_thread = myThread(2, "Eye", map, map_lock)
     threads.append(eye_thread)
 
     # Run threads
     for t in threads:
         t.start()
+
+    # Create thread for routing algorithm and driving
+    map.scanSurroundings()
+
+    time.sleep(20)
+    test = mp.UltrasonicMap()
+    test.print_map(map.map)
+    test.print_map(map.map)
 
     # Wait for threads to complete and join threads
     for t in threads:
