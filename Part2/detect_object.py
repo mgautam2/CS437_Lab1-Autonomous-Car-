@@ -79,7 +79,7 @@ class Eye:
 
 
     def classify_object_on_map(self, label, x, y):
-        if self.map.getLabelAtPoint((x, y)) != co.UNCLASSIFIED_OBJECT:
+        if self.map.getLabelAtPoint((x, y)) > label:
             return False
         
         queue = deque()
@@ -89,18 +89,18 @@ class Eye:
             a, b = queue.popleft()
             if not self.map.isPointInBounds((a, b)):
                 continue
-            if self.map.getLabelAtPoint((a, b)) == co.UNCLASSIFIED_OBJECT:
-                self.map.setLableAtPoint((a, b), label)
+            if self.map.getLabelAtPoint((a, b)) == co.UNCLASSIFIED_OBJECT or (self.map.getLabelAtPoint((a, b)) >= co.WALL and self.map.getLabelAtPoint((a, b)) < label):
+                self.map.setLabelAtPoint((a, b), label)
 
                 # Push all adjacent points in queue
-                queue.append(a + 1, b)
-                queue.append(a + 1, b + 1)
-                queue.append(a, b + 1)
-                queue.append(a - 1, b + 1)
-                queue.append(a - 1, b)
-                queue.append(a - 1, b - 1)
-                queue.append(a, b - 1)
-                queue.append(a + 1, b - 1)
+                queue.append((a + 1, b))
+                queue.append((a + 1, b + 1))
+                queue.append((a, b + 1))
+                queue.append((a - 1, b + 1))
+                queue.append((a - 1, b))
+                queue.append((a - 1, b - 1))
+                queue.append((a, b - 1))
+                queue.append((a + 1, b - 1))
         return True
                    
 
@@ -114,15 +114,15 @@ class Eye:
             if self.map.orientation == co.UP:
                 self.classify_object_on_map(label, h - h_idx, w + w_idx)
             if self.map.orientation == co.RIGHT:
-                self.classify_object_on_map(label, h + h_idx, w + w_idx)
+                self.classify_object_on_map(label, h + w_idx, w + h_idx)
             if self.map.orientation == co.DOWN:
                 self.classify_object_on_map(label, h + h_idx, w - w_idx)
             if self.map.orientation == co.LEFT:
-                self.classify_object_on_map(label, h - h_idx, w - w_idx)
+                self.classify_object_on_map(label, h - w_idx, w - h_idx)
 
 
     def main(self):
-        threshhold = 0.6
+        threshhold = 0.4
         labels = self.load_labels("tmp/coco_labels.txt")
         interpreter = Interpreter("tmp/detect.tflite")
         interpreter.allocate_tensors()
@@ -130,6 +130,7 @@ class Eye:
 
         with picamera.PiCamera(resolution=(CAMERA_WIDTH, CAMERA_HEIGHT), framerate=30) as camera:
             camera.start_preview()
+            camera.rotation = 180
             ANGLE_RANGE = 160
             STEP = 10
             us_step = STEP
@@ -144,11 +145,15 @@ class Eye:
                     stream.seek(0)
                     image = Image.open(stream).convert('RGB').resize((input_width, input_height), Image.ANTIALIAS)
                     results = self.detect_objects(interpreter, image, threshhold)
-
+                    max_label = None
                     for result in results:
-                        label = co.LABEL_TO_MAP[int(result['class_id'])]
-                        self.classify_on_map(label, current_angle)
-                        print(label)
+                        if max_label == None:
+                            max_label = co.LABEL_TO_MAP[int(result['class_id'])]
+                        else:
+                            max_label = max(max_label, co.LABEL_TO_MAP[int(result['class_id'])])
+
+                    if max_label:
+                        self.classify_on_map(max_label, current_angle)
 
                     # Set to new angle
                     current_angle += us_step

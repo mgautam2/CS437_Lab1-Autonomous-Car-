@@ -19,13 +19,13 @@ class Map:
         ultrasonic_map_width = ultrasonicMap.shape[1]
         for i in range(ultrasonicMap.shape[0]):
             for j in range(ultrasonic_map_width):
-                if (self.orientation == UP):
+                if (self.orientation == DOWN):
                     map_i_idx = self.current_position[0] + i
                     map_j_idx = self.current_position[1] + (j - math.floor(ultrasonic_map_width/2))
                 elif (self.orientation == LEFT):
                     map_i_idx = self.current_position[0] + (j - math.floor(ultrasonic_map_width/2))
                     map_j_idx = self.current_position[1] - i
-                elif (self.orientation == DOWN):
+                elif (self.orientation == UP):
                     map_i_idx = self.current_position[0] - i
                     map_j_idx = self.current_position[1] - (j - math.floor(ultrasonic_map_width/2))
                 elif (self.orientation == RIGHT):
@@ -37,7 +37,6 @@ class Map:
                     map_j_idx = 0
                 if (self.isPointInBounds((map_j_idx, map_i_idx))):
                     self.setLabelAtPoint((map_i_idx, map_j_idx), ultrasonicMap[i][j])
-
 
     def printSelf(self):
         print(self.map)
