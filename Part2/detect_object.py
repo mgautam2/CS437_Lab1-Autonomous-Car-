@@ -79,7 +79,7 @@ class Eye:
 
 
     def classify_object_on_map(self, label, x, y):
-        if self.map.getLabelAtPoint((x, y)) != co.UNCLASSIFIED_OBJECT:
+        if self.map.getLabelAtPoint((x, y)) > label:
             return False
         
         queue = deque()
@@ -89,7 +89,7 @@ class Eye:
             a, b = queue.popleft()
             if not self.map.isPointInBounds((a, b)):
                 continue
-            if self.map.getLabelAtPoint((a, b)) == co.UNCLASSIFIED_OBJECT:
+            if self.map.getLabelAtPoint((a, b)) == co.UNCLASSIFIED_OBJECT or (self.map.getLabelAtPoint((a, b)) >= co.WALL and self.map.getLabelAtPoint((a, b)) < label):
                 self.map.setLabelAtPoint((a, b), label)
 
                 # Push all adjacent points in queue
@@ -153,12 +153,6 @@ class Eye:
                             max_label = max(max_label, co.LABEL_TO_MAP[int(result['class_id'])])
 
                     if max_label:
-                        print(results)
-                        print(max_label)
-                        print()
-                        print()
-                        print()
-                        print()
                         self.classify_on_map(max_label, current_angle)
 
                     # Set to new angle
