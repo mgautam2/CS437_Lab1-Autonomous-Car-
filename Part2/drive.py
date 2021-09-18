@@ -8,57 +8,51 @@ import constants
 import routing
 
 
-class Dir(enum.Enum):
-   Up = 0
-   Right = 1
-   Down = 2
-   Left = 3
-
 class Drive:
 
-    def __init__(self, direction = Dir.Right, pos = (0, 0)):
-        self.direction = direction
-        self.pos = pos
+    def __init__(self, map):
+        self.map = map
+        
 
     def turning_dir(self, new_pos):
         dir = ''
 
-        if (new_pos[0] == self.pos[0] - 1) and (new_pos[1] == self.pos[1]):
-            dir = Dir.Up
-        elif (new_pos[0] == self.pos[0]) and (new_pos[1] == self.pos[1] - 1):
-            dir = Dir.Left
-        elif (new_pos[0] == self.pos[0]) and (new_pos[1] == self.pos[1] + 1):
-            dir = Dir.Right
+        if (new_pos[0] == self.map.current_position[0] - 1) and (new_pos[1] == self.map.current_position[1]):
+            dir = constants.UP
+        elif (new_pos[0] == self.map.current_position[0]) and (new_pos[1] == self.map.current_position[1] - 1):
+            dir = constants.LEFT
+        elif (new_pos[0] == self.map.current_position[0]) and (new_pos[1] == self.map.current_position[1] + 1):
+            dir = constants.RIGHT
         else:
-            dir = Dir.Down
+            dir = constants.DOWN
 
         return dir
 
     def dir_from_val(val):
         if (val == 0):
-            return Dir.Up
+            return constants.UP
         elif (val == 1):
-            return Dir.Right
+            return constants.RIGHT
         elif (val == 2):
-            return Dir.Down
+            return constants.DOWN
         elif (val == 3):
-            return Dir.Left 
+            return constants.LEFT 
 
     def update_pos(self):
-        if (self.direction == Dir.Up):
-            self.pos = (self.pos[0] - 1, self.pos[1])
-        elif (self.direction == Dir.Right):
-            self.pos = (self.pos[0], self.pos[1] + 1)
-        elif (self.direction == Dir.Down):
-            self.pos = (self.pos[0] + 1, self.pos[1])
-        elif (self.direction == Dir.Left):
-            self.pos = (self.pos[0], self.pos[1] - 1)
+        if (self.map.orientation == constants.UP):
+            self.map.current_position = (self.map.current_position[0] - 1, self.map.current_position[1])
+        elif (self.map.orientation == constants.RIGHT):
+            self.map.current_position = (self.map.current_position[0], self.map.current_position[1] + 1)
+        elif (self.map.orientation == constants.DOWN):
+            self.map.current_position = (self.map.current_position[0] + 1, self.map.current_position[1])
+        elif (self.map.orientation == constants.LEFT):
+            self.map.current_position = (self.map.current_position[0], self.map.current_position[1] - 1)
 
     """
     Rotate the car
     """
     def turn(self, new_dir):
-        dir_num = new_dir.value - self.direction.value
+        dir_num = new_dir - self.map.orientation
         
         if (dir_num > 0):
             fc.turn_right(constants.TURN_POWER)
@@ -72,7 +66,7 @@ class Drive:
             time.sleep(sleep_time)
             fc.stop() 
 
-        self.direction = new_dir   
+        self.map.orientation = new_dir   
 
     def translate(self): 
         
@@ -87,7 +81,7 @@ class Drive:
     """
     def drive_step(self, new_pos):
         
-        if (self.pos == new_pos):
+        if (self.map.current_position == new_pos):
             return
 
         new_dir = self.turning_dir(new_pos)
@@ -103,8 +97,8 @@ maze.scanSurroundings()
 faltu_mapping.print_map(maze.map)
 route = routing.astar(maze.map, (0, 0), (20, 20))
 
-d = Drive()
-print("Starting pos is " + str(d.pos) + " And direction is " + d.direction.name +"\n-----------------")
+d = Drive(maze)
+# print("Starting pos is " + str(d.pos) + " And direction is " + d.map.orientation.name +"\n-----------------")
 
 
 for step in route:

@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import time
 
 from picar_4wd.ultrasonic import Ultrasonic
 from constants import *
@@ -63,4 +64,6 @@ class Map:
         self.insertMapSection(relative_map)
 
         self.scanning_map = False
+
+        # time.sleep(10)
         
