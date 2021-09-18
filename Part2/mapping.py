@@ -88,7 +88,7 @@ class UltrasonicMap:
     - If all 25 elements in the 5x5 grid are unknown space, the element is marked as unknown space
     '''
     @staticmethod
-    def condense_map(map, scale_factor=5):
+    def condense_map(map, scale_factor=GRANULARITY):
         condensed_height = math.floor(map.shape[0]/scale_factor)
         condensed_width = math.floor(map.shape[1]/scale_factor)
         condensed_map = np.full([condensed_height, condensed_width], UNKNOWN_SPACE, dtype=int)

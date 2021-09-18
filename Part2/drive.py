@@ -4,31 +4,9 @@ import picar_4wd as fc
 
 import map 
 import mapping 
-import constants
+import constants 
 import routing
 
-power_to_speed = {
-    20: 35.5,
-    30: 39.5,
-    40: 44.1,
-    50: 47.7,
-    60: 52.5,
-    70: 55.4,
-    80: 59.5,
-    90: 62.9 
-}
-
-power_right_turn_time = {
-10: 3.95
-}
-
-power_left_turn_time = {
-10: 3.8
-}
-
-power_val = 20
-turn_power_val = 10
-GRID_SIZE = 20
 
 class Dir(enum.Enum):
    Up = 0
@@ -81,27 +59,25 @@ class Drive:
     """
     def turn(self, new_dir):
         dir_num = new_dir.value - self.direction.value
-        print("Turning ->  " + new_dir.name)
         
         if (dir_num > 0):
-            fc.turn_right(turn_power_val)
-            sleep_time = ( dir_num * power_right_turn_time[turn_power_val] ) / 4
+            fc.turn_right(constants.TURN_POWER)
+            sleep_time = ( dir_num * constants.POWER_RIGHT_TURN_TIME[constants.TURN_POWER] ) / 4
             time.sleep(sleep_time)
             fc.stop() 
             
         elif (dir_num < 0):
-            fc.turn_left(turn_power_val)
-            sleep_time = ( abs(dir_num) * power_left_turn_time[turn_power_val] ) / 4
+            fc.turn_left(constants.TURN_POWER)
+            sleep_time = ( abs(dir_num) * constants.POWER_LEFT_TURN_TIME[constants.TURN_POWER] ) / 4
             time.sleep(sleep_time)
             fc.stop() 
 
         self.direction = new_dir   
 
     def translate(self): 
-        print("Moveing  -> " + self.direction.name)
         
-        fc.forward(power_val)
-        sleep_time = GRID_SIZE / power_to_speed[power_val]
+        fc.forward(constants.DRIVE_POWER)
+        sleep_time = constants.GRANULARITY / constants.POWER_TO_SPEED[constants.DRIVE_POWER]
         time.sleep(sleep_time)
         fc.stop() 
         self.update_pos()
@@ -117,7 +93,6 @@ class Drive:
         new_dir = self.turning_dir(new_pos)
         self.turn(new_dir)
         self.translate()
-        print("New pos is " + str(self.pos) + " And direction is " + self.direction.name +"\n-----------------")
 
 
 # TEST THE PATH
@@ -134,4 +109,4 @@ print("Starting pos is " + str(d.pos) + " And direction is " + d.direction.name 
 
 for step in route:
     print(step)
-    # d.drive_step(step)
+    d.drive_step(step)
