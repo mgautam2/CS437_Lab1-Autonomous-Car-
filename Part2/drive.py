@@ -54,11 +54,7 @@ class Drive:
         while (distance < 20 and distance > 2) and ( self.map.isPointInBounds((x1, y1)) and self.map.map[x1][y1] == constants.FREE_SPACE) :    
             fc.stop()
             distance = us.get_distance() 
-            print("stop")
-            
-        print("exitted")
 
-  # nd ( self.map.isPointInBounds((x2, y2)) and self.map.map[x2][y2] == constants.FREE_SPACE)
 
     def turning_dir(self, new_pos):
         dir = ''
@@ -93,10 +89,7 @@ class Drive:
             self.map.current_position = (self.map.current_position[0] + 1, self.map.current_position[1])
         elif (self.map.orientation == constants.LEFT):
             self.map.current_position = (self.map.current_position[0], self.map.current_position[1] - 1)
-
-    """
-    Rotate the car
-    """
+  
     def turn(self, new_dir):
         dir_num = new_dir - self.map.orientation
         
@@ -122,9 +115,6 @@ class Drive:
         fc.stop() 
         self.update_pos()
 
-    """
-    Main drive function 
-    """
     def drive_step(self, new_pos):
 
         if (self.map.current_position == new_pos):
@@ -136,16 +126,3 @@ class Drive:
         self.emergency_stop()
         self.translate()
         self.check_stop_sign()
-
-
-
-# map = map.Map(30, 30, (0, 0), constants.RIGHT)
-# driver = Drive(map)
-
-# while map.current_position != (10, 3):
-#     map.scanSurroundings()
-#     route = routing.astar(map.map, map.current_position, (10, 3))
-#     print(route)
-#     for step in route:
-#         print(step)
-#         driver.drive_step(step)
