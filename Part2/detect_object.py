@@ -119,6 +119,13 @@ class Eye:
                 self.classify_object_on_map(label, h + h_idx, w - w_idx)
             if self.map.orientation == co.LEFT:
                 self.classify_object_on_map(label, h - w_idx, w - h_idx)
+    
+    def calssify_stop_sign_adjacent(self):
+        for i in range(self.map.height):
+            for j in range(self.map.width):
+                if self.map.getLabelAtPoint((i, j)) == co.FREE_SPACE:
+                    if self.map.getLabelAtPoint((i + 1, j)) == co.STOP_SIGN or self.map.getLabelAtPoint((i + 1, j - 1)) == co.STOP_SIGN or self.map.getLabelAtPoint((i, j - 1)) == co.STOP_SIGN or self.map.getLabelAtPoint((i - 1, j - 1)) == co.STOP_SIGN or self.map.getLabelAtPoint((i - 1, j)) == co.STOP_SIGN or self.map.getLabelAtPoint((i - 1, j + 1)) == co.STOP_SIGN or self.map.getLabelAtPoint((i, j + 1)) == co.STOP_SIGN or self.map.getLabelAtPoint((i + 1, j + 1)) == co.STOP_SIGN:
+                        self.map.setLabelAtPoint((i, j), co.STOP_SIGN_ADJACENT)
 
 
     def main(self):
@@ -154,6 +161,7 @@ class Eye:
 
                     if max_label:
                         self.classify_on_map(max_label, current_angle)
+                        self.calssify_stop_sign_adjacent()
 
                     # Set to new angle
                     current_angle += us_step
