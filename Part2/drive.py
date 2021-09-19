@@ -7,6 +7,10 @@ import mapping
 import constants 
 import routing
 
+# from ..picar_4wd.Ultrasonic import Ultrasonic
+                     
+us = fc.Ultrasonic(fc.Pin('D8'), fc.Pin('D9'))                
+
 
 class Drive:
 
@@ -24,8 +28,37 @@ class Drive:
         
         if (self.stop_sign_flag == False):
             self.stop_sign_flag = True
-            print("Stopping")
             time.sleep(2)
+
+    def emergency_stop(self):
+        global us
+        distance = us.get_distance() 
+        print(distance)
+        print("--")
+        x1, y1 = self.map.current_position
+        x2, y2 = self.map.current_position
+
+        if self.map.orientation == constants.UP:
+            x1 -= 1
+            x2 -= 2
+        if self.map.orientation == constants.RIGHT:
+            y1 += 1
+            y2 += 2
+        if self.map.orientation == constants.DOWN:
+            x1 += 1
+            x2 += 2
+        if self.map.orientation == constants.LEFT:
+            y1 -= 1
+            y2 -= 2
+
+        while (distance < 20 and distance > 2) and ( self.map.isPointInBounds((x1, y1)) and self.map.map[x1][y1] == constants.FREE_SPACE) :    
+            fc.stop()
+            distance = us.get_distance() 
+            print("stop")
+            
+        print("exitted")
+
+  # nd ( self.map.isPointInBounds((x2, y2)) and self.map.map[x2][y2] == constants.FREE_SPACE)
 
     def turning_dir(self, new_pos):
         dir = ''
@@ -93,11 +126,26 @@ class Drive:
     Main drive function 
     """
     def drive_step(self, new_pos):
+
         if (self.map.current_position == new_pos):
             return
 
         temp_orientation = self.turning_dir(new_pos)
         self.turn(temp_orientation)
         self.map.orientation = temp_orientation
+        self.emergency_stop()
         self.translate()
         self.check_stop_sign()
+
+
+
+# map = map.Map(30, 30, (0, 0), constants.RIGHT)
+# driver = Drive(map)
+
+# while map.current_position != (10, 3):
+#     map.scanSurroundings()
+#     route = routing.astar(map.map, map.current_position, (10, 3))
+#     print(route)
+#     for step in route:
+#         print(step)
+#         driver.drive_step(step)
