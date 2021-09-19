@@ -8,11 +8,24 @@ import constants
 import routing
 
 
+stop_sign_flag = False
+
 class Drive:
 
     def __init__(self, map):
         self.map = map
         
+    def check_stop_sign(self):
+        x = self.map.current_position[0]
+        y = self.map.current_position[1]
+
+        if (self.map.map[0][1] != contants.STOP_SIGN_ADJACENT)
+            stop_sign_flag = False
+            return
+        
+        if (stop_sign_flag == False):
+            stop_sign_flag = True
+            time.sleep(2)
 
     def turning_dir(self, new_pos):
         dir = ''
@@ -86,6 +99,7 @@ class Drive:
 
         self.map.orientation = self.turning_dir(new_pos)
         self.turn(self.map.orientation)
+        self.check_stop_sign()
         self.translate()
 
 
