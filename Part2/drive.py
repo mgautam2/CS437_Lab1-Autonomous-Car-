@@ -8,23 +8,23 @@ import constants
 import routing
 
 
-stop_sign_flag = False
-
 class Drive:
 
     def __init__(self, map):
         self.map = map
+        self.stop_sign_flag = False
         
     def check_stop_sign(self):
         x = self.map.current_position[0]
         y = self.map.current_position[1]
 
-        if (self.map.map[0][1] != contants.STOP_SIGN_ADJACENT)
-            stop_sign_flag = False
+        if (self.map.map[x][y] != constants.STOP_SIGN_ADJACENT):
+            self.stop_sign_flag = False
             return
         
-        if (stop_sign_flag == False):
-            stop_sign_flag = True
+        if (self.stop_sign_flag == False):
+            self.stop_sign_flag = True
+            print("Stopping")
             time.sleep(2)
 
     def turning_dir(self, new_pos):
@@ -93,28 +93,11 @@ class Drive:
     Main drive function 
     """
     def drive_step(self, new_pos):
-        
         if (self.map.current_position == new_pos):
             return
 
-        self.map.orientation = self.turning_dir(new_pos)
-        self.turn(self.map.orientation)
-        self.check_stop_sign()
+        temp_orientation = self.turning_dir(new_pos)
+        self.turn(temp_orientation)
+        self.map.orientation = temp_orientation
         self.translate()
-
-
-# # TEST THE PATH
-# maze = map.Map(30, 30, (0, 0), constants.RIGHT)
-
-# faltu_mapping = mapping.UltrasonicMap()
-# maze.scanSurroundings()
-# faltu_mapping.print_map(maze.map)
-# route = routing.astar(maze.map, (0, 0), (20, 20))
-
-# d = Drive(maze)
-# # print("Starting pos is " + str(d.pos) + " And direction is " + d.map.orientation.name +"\n-----------------")
-
-
-# for step in route:
-#     print(step)
-#     d.drive_step(step)
+        self.check_stop_sign()

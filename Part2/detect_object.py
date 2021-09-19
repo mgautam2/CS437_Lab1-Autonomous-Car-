@@ -180,6 +180,9 @@ class Eye:
 
                     if self.map.scanning_map:
                         time.sleep(4)
+                    
+                    if self.map.task_complete:
+                        break
 
             finally:
                 camera.stop_preview()

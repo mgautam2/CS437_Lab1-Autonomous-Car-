@@ -66,9 +66,13 @@ if __name__ == "__main__":
     while map.current_position != (args.endh, args.endw):
         map.scanSurroundings()
         route = rt.astar(map.map, map.current_position, (args.endh, args.endw))
+        print(route)
         for step in route:
-            print(step)
-            # driver.drive_step(step)
+            # print(step)
+            driver.drive_step(step)
+
+    # We have reached our final destination
+    map.task_complete = True
 
     # Wait for threads to complete and join threads
     for t in threads:
