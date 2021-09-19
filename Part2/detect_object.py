@@ -79,6 +79,8 @@ class Eye:
 
 
     def classify_object_on_map(self, label, x, y):
+        if not self.map.isPointInBounds((x,y)):
+            return False
         if self.map.getLabelAtPoint((x, y)) > label:
             return False
         
