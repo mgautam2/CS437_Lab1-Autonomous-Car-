@@ -84,23 +84,23 @@ class Drive:
         if (self.map.current_position == new_pos):
             return
 
-        new_dir = self.turning_dir(new_pos)
-        self.turn(new_dir)
+        self.map.orientation = self.turning_dir(new_pos)
+        self.turn(self.map.orientation)
         self.translate()
 
 
-# TEST THE PATH
-maze = map.Map(30, 30, (0, 0), constants.RIGHT)
+# # TEST THE PATH
+# maze = map.Map(30, 30, (0, 0), constants.RIGHT)
 
-faltu_mapping = mapping.UltrasonicMap()
-maze.scanSurroundings()
-faltu_mapping.print_map(maze.map)
-route = routing.astar(maze.map, (0, 0), (20, 20))
+# faltu_mapping = mapping.UltrasonicMap()
+# maze.scanSurroundings()
+# faltu_mapping.print_map(maze.map)
+# route = routing.astar(maze.map, (0, 0), (20, 20))
 
-d = Drive(maze)
-# print("Starting pos is " + str(d.pos) + " And direction is " + d.map.orientation.name +"\n-----------------")
+# d = Drive(maze)
+# # print("Starting pos is " + str(d.pos) + " And direction is " + d.map.orientation.name +"\n-----------------")
 
 
-for step in route:
-    print(step)
-    d.drive_step(step)
+# for step in route:
+#     print(step)
+#     d.drive_step(step)
