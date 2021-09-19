@@ -10,6 +10,7 @@ import mapping as mp
 import detect_object as do
 import routing as rt
 import map as ma
+import drive as dv
 
 class myThread(threading.Thread):
     def __init__(self, threadID, name, map, map_lock):    
@@ -61,7 +62,13 @@ if __name__ == "__main__":
         t.start()
 
     # Create thread for routing algorithm and driving
-    
+    driver = dv.Drive(map)
+    while map.current_position != (args.endh, args.endw):
+        map.scanSurroundings()
+        route = rt.astar(map.map, map.current_position, (args.endh, args.endw))
+        for step in route:
+            print(step)
+            # driver.drive_step(step)
 
     # Wait for threads to complete and join threads
     for t in threads:

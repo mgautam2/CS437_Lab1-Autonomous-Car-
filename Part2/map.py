@@ -65,5 +65,7 @@ class Map:
 
         self.scanning_map = False
 
-        # time.sleep(10)
+        time.sleep(10)
+        m = mp.UltrasonicMap()
+        m.print_map(self.map)
         

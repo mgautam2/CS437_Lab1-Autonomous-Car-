@@ -91,6 +91,8 @@ def get_neighbors(pos):
     return neighbors
 
 def astar(map, start_pos = (0, 0), end_pos = (30, 30)):
+    print(start_pos)
+    print(end_pos)
     global MAZE, orientation, old_pos
     path = []
     state = Node( start_pos, None, 0, 0, 0)
