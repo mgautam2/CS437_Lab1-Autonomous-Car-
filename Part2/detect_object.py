@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import argparse
 import io
 import re
 import time
@@ -26,6 +25,7 @@ class Eye:
     def __init__(self, m, map_lock):
         self.map = m
         self.map_lock = map_lock
+        self.start_scan_time = 0.0
 
     def load_labels(self, path):
         """Loads the labels file. Supports files with or without index numbers."""
@@ -132,7 +132,6 @@ class Eye:
 
     def main(self):
         threshhold = 0.4
-        labels = self.load_labels("tmp/coco_labels.txt")
         interpreter = Interpreter("tmp/detect.tflite")
         interpreter.allocate_tensors()
         _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
@@ -166,20 +165,24 @@ class Eye:
                         self.calssify_stop_sign_adjacent()
 
                     # Set to new angle
-                    current_angle += us_step
-                    if current_angle >= max_angle:
-                        current_angle = max_angle
-                        us_step = -STEP
-                    elif current_angle <= min_angle:
-                        current_angle = min_angle
-                        us_step = STEP
-                    fc.get_distance_at(current_angle)
+                    if time.time() - self.start_scan_time <= 10:
+                        current_angle += us_step
+                        if current_angle >= max_angle:
+                            current_angle = max_angle
+                            us_step = -STEP
+                        elif current_angle <= min_angle:
+                            current_angle = min_angle
+                            us_step = STEP
+                        fc.get_distance_at(current_angle)
+                    else:
+                        fc.get_distance_at(0)
 
                     stream.seek(0)
                     stream.truncate()
 
                     if self.map.scanning_map:
                         time.sleep(4)
+                        self.start_scan_time = time.time()
                     
                     if self.map.task_complete:
                         break
