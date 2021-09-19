@@ -53,9 +53,9 @@ def turn_dir(pos, new_pos):
 
 def turn_dir_weight(new_dir, man_dist):
     if (new_dir == orientation) :
-        return man_dist * 5 
+        return - man_dist * 2 
     else :
-        return - man_dist * 5
+        return  man_dist * 2
 
 
 def manhattan_dist(pos, end):
@@ -100,7 +100,7 @@ def astar(map, start_pos = (0, 0), end_pos = (30, 30)):
     old_pos = start_pos
     orientation = constants.RIGHT
     MAZE = map
-    heapq.heappush(list, (-state.g_h, state))
+    heapq.heappush(list, (state.g_h, state))
     visited = {state.pos : state}
 
     while (list):
@@ -122,7 +122,7 @@ def astar(map, start_pos = (0, 0), end_pos = (30, 30)):
                     dir_weight = turn_dir_weight(neigh_dir, man_dist)
 
                     neigh_state = Node(neighbor, state.pos, state.p_cost + 1, state.p_cost + 1 + man_dist + dir_weight , manhattan_dist(neighbor, end_pos))
-                    heapq.heappush(list, (-neigh_state.g_h, neigh_state))
+                    heapq.heappush(list, (neigh_state.g_h, neigh_state))
                     visited[neigh_state.pos] =  neigh_state
     
     parent = None
